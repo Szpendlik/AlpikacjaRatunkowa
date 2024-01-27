@@ -50,14 +50,8 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         accelerometerValues = findViewById(R.id.accelerometerValues)
         gyroscopeValues = findViewById(R.id.gyroscopeValues)
-
-        startEmergencyButton = findViewById(R.id.startEmergencyButton)
-
-        sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        gyroscope = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-
         gpsValues = findViewById(R.id.gpsValues)
+        startEmergencyButton = findViewById(R.id.startEmergencyButton)
 
         val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -100,7 +94,9 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 arrayOf<String>(
 
                     Manifest.permission.SEND_SMS
-
+                ), 2
+            )
+        }
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
