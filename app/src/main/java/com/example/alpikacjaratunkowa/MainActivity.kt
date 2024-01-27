@@ -12,30 +12,39 @@ import android.widget.TextView
 
 class MainActivity : AppCompatActivity(),SensorEventListener {
 
-    //private val NS2S = 1.0f / 1000000000.0f
-    //private val deltaRotationVector = FloatArray(4) { 0f }
-    //private var timestamp: Float = 0f
+    private val NS2S = 1.0f / 1000000000.0f
+    private val deltaRotationVector = FloatArray(4) { 0f }
+    private var timestamp: Float = 0f
+
 
     private lateinit var sensorManager: SensorManager
     private val acceletometer: Sensor? = null
+    private val gyroscope: Sensor? = null
     private lateinit var accelerometerValues: TextView
+    private lateinit var gyroscopeValues: TextView
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        accelerometerValues = findViewById(R.id.accelerometrValues)
+        gyroscopeValues = findViewById(R.id.gyroscopeValues)
 
         val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        //val  gyroscope: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-
-        accelerometerValues = findViewById(R.id.accelerometrValues)
+        val  gyroscope: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
 
         if (accelerometer != null){
             sensorManager.registerListener(this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL)
         }else {
             accelerometerValues.text = "No accelerometer found"
+        }
+
+        if(gyroscope != null){
+            sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_NORMAL)
+        }else{
+            gyroscopeValues.text = "No gyroscope found"
         }
     }
     @SuppressLint("SetTextI18n")
@@ -47,6 +56,14 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
 
             val values = "X: $x\nY: $y\nZ: $z"
             accelerometerValues.text = "Accelerometer Values:\n$values"
+        }
+        if (event.sensor.type == Sensor.TYPE_GYROSCOPE){
+            val x = event.values[0]
+            val y = event.values[1]
+            val z = event.values[2]
+
+            val values = "X: $x\nY: $y\nZ: $z"
+            gyroscopeValues.text = "Accelerometer Values:\n$values"
         }
     }
 
