@@ -1,6 +1,5 @@
 package com.example.alpikacjaratunkowa
 
-import PermissionUtils
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
@@ -9,14 +8,18 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import android.location.Location
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
@@ -45,7 +48,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         val gyroscope: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-        val gps = LocationServices.getFusedLocationProviderClient(this)
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
         if (accelerometer != null){
             sensorManager.registerListener(this,accelerometer,SensorManager.SENSOR_DELAY_NORMAL)
@@ -58,7 +61,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         }else{
             gyroscopeValues.text = "No gyroscope found"
         }
-
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -77,9 +79,19 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 1
             )
             return
-        }
-        gps.lastLocation.addOnSuccessListener { location: Location? ->
-            gpsValues.text = location.toString()
+        } else {
+            val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).build()
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(p0: LocationResult) {
+                    for (location in p0.locations){
+                        print("Location UPdate")
+                        gpsValues.text = location.toString()
+                    }
+                }
+            }
+            fusedLocationClient.requestLocationUpdates(locationRequest,
+                locationCallback,
+                Looper.getMainLooper())
         }
     }
 
