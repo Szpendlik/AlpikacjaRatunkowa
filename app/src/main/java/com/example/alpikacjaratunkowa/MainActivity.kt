@@ -63,6 +63,7 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
+        SensorManager.SENSOR_STATUS_ACCURACY_HIGH
     }
 
     override fun onDestroy() {
