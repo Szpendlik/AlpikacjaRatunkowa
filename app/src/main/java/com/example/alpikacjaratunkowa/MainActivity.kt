@@ -12,11 +12,6 @@ import android.widget.TextView
 
 class MainActivity : AppCompatActivity(),SensorEventListener {
 
-    private val NS2S = 1.0f / 1000000000.0f
-    private val deltaRotationVector = FloatArray(4) { 0f }
-    private var timestamp: Float = 0f
-
-
     private lateinit var sensorManager: SensorManager
     private val acceletometer: Sensor? = null
     private val gyroscope: Sensor? = null
