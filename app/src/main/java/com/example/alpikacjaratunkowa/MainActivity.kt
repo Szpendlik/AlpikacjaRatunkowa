@@ -19,10 +19,14 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 
 
-class MainActivity : AppCompatActivity(),SensorEventListener {
+class MainActivity : AppCompatActivity(), SensorEventListener {
+
+    private var lastX:Float = 0f
+    private var lastY:Float = 0f
+    private var lastZ:Float = 0f
 
     private lateinit var sensorManager: SensorManager
-    private val acceletometer: Sensor? = null
+    private val accelerometer: Sensor? = null
     private val gyroscope: Sensor? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var accelerometerValues: TextView
@@ -86,25 +90,48 @@ class MainActivity : AppCompatActivity(),SensorEventListener {
             val y = event.values[1]
             val z = event.values[2]
 
-            val values = "X: $x\nY: $y\nZ: $z"
-            accelerometerValues.text = "Accelerometer Values:\n$values"
+            if (hasValueChanged(x, y, z)){
+                val values = "X: $x\nY: $y\nZ: $z"
+                accelerometerValues.text = "Accelerometer Values:\n$values"
+            }
         }
         if (event.sensor.type == Sensor.TYPE_GYROSCOPE){
             val x = event.values[0]
             val y = event.values[1]
             val z = event.values[2]
 
-            val values = "X: $x\nY: $y\nZ: $z"
-            gyroscopeValues.text = "Accelerometer Values:\n$values"
+            if (hasValueChanged(x, y, z)){
+                val values = "X: $x\nY: $y\nZ: $z"
+                gyroscopeValues.text = "Accelerometer Values:\n$values"
+            }
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        println("Implemented onAccuracyChanged MainAcitvieit")
+        SensorManager.SENSOR_STATUS_ACCURACY_HIGH
     }
 
     override fun onDestroy() {
         super.onDestroy()
         sensorManager.unregisterListener(this)
+    }
+    private fun hasValueChanged(x:Float, y:Float, z:Float):Boolean{
+        val threshold = 0.5f // Adjust this threshold based on your sensitivity requirements
+
+        val deltaX = Math.abs(x - lastX)
+        val deltaY = Math.abs(y - lastY)
+        val deltaZ = Math.abs(z - lastZ)
+
+        // Check if any of the differences is greater than the threshold
+        if (deltaX > threshold || deltaY > threshold || deltaZ > threshold) {
+            // Values have changed
+            lastX = x
+            lastY = y
+            lastZ = z
+            return true
+        }
+
+        // Values have not changed
+        return false
     }
 }
