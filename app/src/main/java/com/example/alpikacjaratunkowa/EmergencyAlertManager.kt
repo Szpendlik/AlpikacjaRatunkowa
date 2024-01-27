@@ -1,5 +1,4 @@
 package com.example.alpikacjaratunkowa
-
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
@@ -9,7 +8,6 @@ import android.telephony.SmsManager
 import android.widget.Toast
 
 class EmergencyAlertManager(private val context: Context) {
-
     private lateinit var countDownTimer: CountDownTimer
     private var isAlertShown = false
 
