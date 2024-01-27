@@ -24,9 +24,12 @@ import com.google.android.gms.location.Priority
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
-    private var lastX:Float = 0f
-    private var lastY:Float = 0f
-    private var lastZ:Float = 0f
+    private var lastAccX:Float = 0f
+    private var lastAccY:Float = 0f
+    private var lastAccZ:Float = 0f
+    private var lastGyroX:Float = 0f
+    private var lastGyroY:Float = 0f
+    private var lastGyroZ:Float = 0f
 
     private lateinit var sensorManager: SensorManager
     private val accelerometer: Sensor? = null
@@ -97,24 +100,26 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
     @SuppressLint("SetTextI18n")
     override fun onSensorChanged(event: SensorEvent) {
-        if (event.sensor.type == Sensor.TYPE_ACCELEROMETER) {
-            val x = event.values[0]
-            val y = event.values[1]
-            val z = event.values[2]
+        when(event.sensor.type){
+            Sensor.TYPE_ACCELEROMETER -> {
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2]
 
-            if (hasValueChanged(x, y, z)){
-                val values = "X: $x\nY: $y\nZ: $z"
-                accelerometerValues.text = "Accelerometer Values:\n$values"
+                if (hasAccValueChanged(x, y, z)){
+                    val values = "X: $x\nY: $y\nZ: $z"
+                    accelerometerValues.text = "Accelerometer Values:\n$values"
+                }
             }
-        }
-        if (event.sensor.type == Sensor.TYPE_GYROSCOPE){
-            val x = event.values[0]
-            val y = event.values[1]
-            val z = event.values[2]
+            Sensor.TYPE_GYROSCOPE -> {
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2]
 
-            if (hasValueChanged(x, y, z)){
-                val values = "X: $x\nY: $y\nZ: $z"
-                gyroscopeValues.text = "Accelerometer Values:\n$values"
+                if (hasGyroValueChanged(x, y, z)){
+                    val values = "X: $x\nY: $y\nZ: $z"
+                    gyroscopeValues.text = "Gyroscope Values:\n$values"
+                }
             }
         }
     }
@@ -127,19 +132,38 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         super.onDestroy()
         sensorManager.unregisterListener(this)
     }
-    private fun hasValueChanged(x:Float, y:Float, z:Float):Boolean{
+    private fun hasAccValueChanged(x:Float, y:Float, z:Float):Boolean{
         val threshold = 0.5f // Adjust this threshold based on your sensitivity requirements
 
-        val deltaX = Math.abs(x - lastX)
-        val deltaY = Math.abs(y - lastY)
-        val deltaZ = Math.abs(z - lastZ)
+        val deltaX = Math.abs(x - lastAccX)
+        val deltaY = Math.abs(y - lastAccY)
+        val deltaZ = Math.abs(z - lastAccZ)
 
         // Check if any of the differences is greater than the threshold
         if (deltaX > threshold || deltaY > threshold || deltaZ > threshold) {
             // Values have changed
-            lastX = x
-            lastY = y
-            lastZ = z
+            lastAccX = x
+            lastAccY = y
+            lastAccZ = z
+            return true
+        }
+
+        // Values have not changed
+        return false
+    }
+    private fun hasGyroValueChanged(x:Float, y:Float, z:Float):Boolean{
+        val threshold = 0.5f // Adjust this threshold based on your sensitivity requirements
+
+        val deltaX = Math.abs(x - lastGyroX)
+        val deltaY = Math.abs(y - lastGyroY)
+        val deltaZ = Math.abs(z - lastGyroZ)
+
+        // Check if any of the differences is greater than the threshold
+        if (deltaX > threshold || deltaY > threshold || deltaZ > threshold) {
+            // Values have changed
+            lastGyroX = x
+            lastGyroY = y
+            lastGyroZ = z
             return true
         }
 
