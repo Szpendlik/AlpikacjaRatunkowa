@@ -16,8 +16,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var lastY:Float = 0f
     private var lastZ:Float = 0f
 
-
-
     private lateinit var sensorManager: SensorManager
     private val accelerometer: Sensor? = null
     private val gyroscope: Sensor? = null
@@ -81,7 +79,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         sensorManager.unregisterListener(this)
     }
     private fun hasValueChanged(x:Float, y:Float, z:Float):Boolean{
-        val threshold = 0.9f // Adjust this threshold based on your sensitivity requirements
+        val threshold = 0.5f // Adjust this threshold based on your sensitivity requirements
 
         val deltaX = Math.abs(x - lastX)
         val deltaY = Math.abs(y - lastY)
