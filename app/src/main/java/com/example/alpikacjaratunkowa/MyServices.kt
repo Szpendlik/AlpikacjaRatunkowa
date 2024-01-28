@@ -32,12 +32,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlin.math.abs
 
 class MyServices: Service(),SensorEventListener {
 
 
-    private var thresholdAcc: Float = 0.5f
-    private var thresholdGyro: Float = 0.5f
+    private var thresholdAcc: Float = 20.0f
+    private var thresholdGyro: Float = 5.0f
     private var lastAccX: Float = 0f
     private var lastAccY: Float = 0f
     private var lastAccZ: Float = 0f
@@ -218,9 +219,9 @@ class MyServices: Service(),SensorEventListener {
 
     private fun hasAccValueChanged(x: Float, y: Float, z: Float): Boolean {
 
-        val deltaX = Math.abs(x - lastAccX)
-        val deltaY = Math.abs(y - lastAccY)
-        val deltaZ = Math.abs(z - lastAccZ)
+        val deltaX = abs(x - lastAccX)
+        val deltaY = abs(y - lastAccY)
+        val deltaZ = abs(z - lastAccZ)
 
         // Check if any of the differences is greater than the threshold
         if (deltaX > thresholdAcc || deltaY > thresholdAcc || deltaZ > thresholdAcc) {
@@ -237,9 +238,9 @@ class MyServices: Service(),SensorEventListener {
 
     private fun hasGyroValueChanged(x: Float, y: Float, z: Float): Boolean {
 
-        val deltaX = Math.abs(x - lastGyroX)
-        val deltaY = Math.abs(y - lastGyroY)
-        val deltaZ = Math.abs(z - lastGyroZ)
+        val deltaX = abs(x - lastGyroX)
+        val deltaY = abs(y - lastGyroY)
+        val deltaZ = abs(z - lastGyroZ)
 
         // Check if any of the differences is greater than the threshold
         if (deltaX > thresholdGyro || deltaY > thresholdGyro || deltaZ > thresholdGyro) {
@@ -254,6 +255,7 @@ class MyServices: Service(),SensorEventListener {
         return false
     }
 
+    @SuppressLint("InvalidWakeLockTag")
     private fun personNotSave() {
         if (hasAccValueChanged(currentAccX, currentAccY, currentAccZ) && hasGyroValueChanged(
                 currentGyroX,
@@ -262,6 +264,9 @@ class MyServices: Service(),SensorEventListener {
             )
         ) {
             emergencyAlertManager.startEmergencyAlert(10000, phoneNumber, lastSeenLocation)
+            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+            val wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP, "Tag")
+            wakeLock.acquire()
         }
     }
 }
