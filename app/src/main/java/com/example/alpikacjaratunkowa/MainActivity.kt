@@ -8,6 +8,7 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -31,6 +32,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var lastGyroX:Float = 0f
     private var lastGyroY:Float = 0f
     private var lastGyroZ:Float = 0f
+    private var lastSeenLocation: Location? = null
 
     private lateinit var sensorManager: SensorManager
     private val accelerometer: Sensor? = null
@@ -76,7 +78,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // Obsługa kliknięcia przycisku
         startEmergencyButton.setOnClickListener {
             // Rozpocznij alert w przypadku kliknięcia przycisku
-          //  emergencyAlertManager.startEmergencyAlert(10000, "")
+            emergencyAlertManager.startEmergencyAlert(10000, "507480247", lastSeenLocation)
         }
 
         if (ActivityCompat.checkSelfPermission(
@@ -121,7 +123,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
             val locationCallback = object : LocationCallback() {
                 override fun onLocationResult(p0: LocationResult) {
                     for (location in p0.locations){
-                        print("Location UPdate")
+                        lastSeenLocation = location
                         gpsValues.text = SMSMessageUtils.getCity(location.latitude, location.longitude, this@MainActivity)
                     }
                 }
