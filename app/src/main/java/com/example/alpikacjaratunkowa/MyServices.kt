@@ -87,9 +87,6 @@ class MyServices: Service(),SensorEventListener {
     private lateinit var wakeLock: PowerManager.WakeLock
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // do your jobs here
-        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyApp::MyWakelockTag")
-        wakeLock.acquire()
         println("IM IN THE FUCKING FOREGROUND")
         Log.d("MyServices", "IM IN THE FOREGROUND")
 
@@ -129,11 +126,7 @@ class MyServices: Service(),SensorEventListener {
                 println("Printing every 1 second in the loop")
                 Log.d("MyServices", "IM IN THE FOREGROUND")
 
-                unRegisterListeners()
                 registerListeners()
-                val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
-                wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "MyApp::MyWakelockTag")
-                wakeLock.acquire(2000)
             }
         }
         // Obsługa kliknięcia przycisku
