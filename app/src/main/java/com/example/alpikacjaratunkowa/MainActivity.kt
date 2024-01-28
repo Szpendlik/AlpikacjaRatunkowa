@@ -131,7 +131,6 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 Looper.getMainLooper())
         }
     }
-
     @SuppressLint("SetTextI18n")
     override fun onSensorChanged(event: SensorEvent) {
         when(event.sensor.type){
@@ -169,7 +168,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun hasAccValueChanged(x:Float, y:Float, z:Float):Boolean{
-        val threshold = 0.5f // Adjust this threshold based on your sensitivity requirements
+        val threshold = 1.0f // Adjust this threshold based on your sensitivity requirements
 
         val deltaX = Math.abs(x - lastAccX)
         val deltaY = Math.abs(y - lastAccY)
@@ -188,7 +187,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return false
     }
     private fun hasGyroValueChanged(x:Float, y:Float, z:Float):Boolean{
-        val threshold = 0.5f // Adjust this threshold based on your sensitivity requirements
+        val threshold = 0.7f // Adjust this threshold based on your sensitivity requirements
 
         val deltaX = Math.abs(x - lastGyroX)
         val deltaY = Math.abs(y - lastGyroY)
