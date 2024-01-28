@@ -7,7 +7,7 @@ import android.os.IBinder
 import androidx.annotation.Nullable
 
 
-class Services: Service() {
+class MyServices: Service() {
     @Nullable
     override fun onBind(intent: Intent?): IBinder? {
         return null
@@ -15,6 +15,7 @@ class Services: Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         // do your jobs here
+
         return super.onStartCommand(intent, flags, startId)
     }
 }
