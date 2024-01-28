@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/alert_dialog_bg</item>
+        <item name="android:colorAccent">@color/alert_button_color</item>
+        <!-- Dodaj inne atrybuty stylu -->
+    </style>
+</resources>

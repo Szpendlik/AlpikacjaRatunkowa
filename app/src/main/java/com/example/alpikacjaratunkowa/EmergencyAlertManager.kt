@@ -1,14 +1,20 @@
 package com.example.alpikacjaratunkowa
-import android.app.AlertDialog
+
+
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
+import android.media.MediaPlayer
+import android.os.Build
 import android.os.CountDownTimer
+import android.os.VibrationEffect
+import android.os.Vibrator
 import android.telephony.SmsManager
 import android.widget.Toast
-
+import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
 class EmergencyAlertManager(private val context: Context) {
     private lateinit var countDownTimer: CountDownTimer
+    private lateinit var alertTimer: CountDownTimer
     private var isAlertShown = false
 
     fun startEmergencyAlert(countdownDuration: Long, phoneNumber: String) {
@@ -18,7 +24,8 @@ class EmergencyAlertManager(private val context: Context) {
     }
 
     private fun showAlert(countdownDuration: Long, phoneNumber: String) {
-        val alertDialog = AlertDialog.Builder(context)
+        // Dostosowanie stylu okna alertu
+        val alertDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
             .setTitle("Emergency Alert")
             .setMessage("Czy potrzebujesz pomocy? Kliknij OK, aby anulować.")
             .setCancelable(false)
@@ -42,25 +49,72 @@ class EmergencyAlertManager(private val context: Context) {
             }
         }
 
+        alertTimer = object : CountDownTimer(countdownDuration, 500) {
+            override fun onTick(millisUntilFinished: Long) {
+                // Odtwarzanie dźwięku i wibracji co 500 ms
+                playAlertSound()
+                vibrate()
+            }
+
+            override fun onFinish() {
+                // Zakończenie odtwarzania dźwięku i wibracji po zakończeniu alertu
+                stopAlertSound()
+                stopVibration()
+            }
+        }
+
+        // Dostosowanie tła i koloru przycisków
+        alertDialog.window?.setBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.alert_dialog_bg))
+        alertDialog.setOnShowListener {
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)?.setTextColor(ContextCompat.getColor(context, R.color.alert_button_color))
+        }
+
         alertDialog.show()
         countDownTimer.start()
+        alertTimer.start()
         isAlertShown = true
     }
 
     private fun cancelAlert() {
         countDownTimer.cancel()
+        alertTimer.cancel()
         isAlertShown = false
+        stopAlertSound()
+        stopVibration()
         Toast.makeText(context, "Alert anulowany", Toast.LENGTH_SHORT).show()
     }
 
     private fun sendEmergencySMS(phoneNumber: String) {
-//        try {
-            val smsManager = SmsManager.getDefault()
-            val message = "Pomusz mi proszę"
-            smsManager.sendTextMessage(phoneNumber, null, message, null, null)
-            Toast.makeText(context, "SMS wysłany", Toast.LENGTH_SHORT).show()
-//        } catch (e: Exception) {
-//            Toast.makeText(context, "Wystąpił błąd podczas wysyłania SMS-a", Toast.LENGTH_SHORT).show()
-      //  }
+        val smsManager = SmsManager.getDefault()
+        val message = "Pomusz mi proszę"
+        smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+        Toast.makeText(context, "SMS wysłany", Toast.LENGTH_SHORT).show()
+    }
+
+    private var mediaPlayer: MediaPlayer? = null
+
+    private fun playAlertSound() {
+        if (mediaPlayer == null) {
+            mediaPlayer = MediaPlayer.create(context, R.raw.alert_sound)
+            mediaPlayer?.isLooping = true
+            mediaPlayer?.start()
+        }
+    }
+
+    private fun stopAlertSound() {
+        mediaPlayer?.stop()
+        mediaPlayer?.release()
+        mediaPlayer = null
+    }
+
+    private fun vibrate() {
+        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        val vibrationEffect = VibrationEffect.createOneShot(500, VibrationEffect.DEFAULT_AMPLITUDE)
+        vibrator.vibrate(vibrationEffect)
+    }
+
+    private fun stopVibration() {
+        val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+        vibrator.cancel()
     }
 }

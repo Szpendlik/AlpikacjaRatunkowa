@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         // Obsługa kliknięcia przycisku
         startEmergencyButton.setOnClickListener {
             // Rozpocznij alert w przypadku kliknięcia przycisku
-          //  emergencyAlertManager.startEmergencyAlert(10000, "")
+            emergencyAlertManager.startEmergencyAlert(10000, "790326216")
         }
 
         if (ActivityCompat.checkSelfPermission(
@@ -97,6 +97,28 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 ), 2
             )
         }
+
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.VIBRATE
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.VIBRATE
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            Log.d("NOHOMO", "NOHOMO")
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf<String>(
+
+                    Manifest.permission.VIBRATE
+                ), 3
+            )
+        }
+
+
+
+
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
