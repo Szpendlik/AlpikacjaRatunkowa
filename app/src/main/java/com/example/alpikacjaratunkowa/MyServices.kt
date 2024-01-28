@@ -2,6 +2,9 @@ package com.example.alpikacjaratunkowa
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.app.Notification
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -11,11 +14,12 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
+import android.os.Build
 
 import android.os.IBinder
 import android.os.Looper
+import android.os.PowerManager
 import android.util.Log
-import androidx.annotation.Nullable
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -51,8 +55,8 @@ class MyServices: Service(),SensorEventListener {
 
 
     private lateinit var sensorManager: SensorManager
-    private val accelerometer: Sensor? = null
-    private val gyroscope: Sensor? = null
+    private var accelerometer: Sensor? = null
+    private var gyroscope: Sensor? = null
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var emergencyAlertManager: EmergencyAlertManager
 
@@ -61,40 +65,77 @@ class MyServices: Service(),SensorEventListener {
     }
 
     private var job: Job? = null
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        // do your jobs here
-        println("IM IN THE FUCKING FOREGROUND")
-        Log.d("MyServices", "IM IN THE FOREGROUND")
-        job = CoroutineScope(Dispatchers.Default).launch {
-            while (true) {
-                delay(1000) // Set the interval in milliseconds
-                println("Printing every 1 second in the loop")
-                Log.d("MyServices", "IM IN THE FOREGROUND")
-            }
-        }
-
-
-        val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-        val accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-        val gyroscope: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-
-
-        emergencyAlertManager = EmergencyAlertManager(this)
-
+    fun registerListeners(){
         if (accelerometer != null) {
             sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
+            Log.d("Accelerometer","accelerometer found")
         } else {
             Log.d("Accelerometer","No accelerometer found")
         }
-
         if (gyroscope != null) {
+            Log.d("Gyroscope","gyroscope found")
             sensorManager.registerListener(this, gyroscope, SensorManager.SENSOR_DELAY_NORMAL)
         } else {
             Log.d("Gyroscope","No gyroscope found")
         }
 
+    }
+    fun unRegisterListeners(){
+        sensorManager.unregisterListener(this, accelerometer)
+        sensorManager.unregisterListener(this, gyroscope)
+    }
+    private lateinit var wakeLock: PowerManager.WakeLock
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        // do your jobs here
+        val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "MyApp::MyWakelockTag")
+        wakeLock.acquire()
+        println("IM IN THE FUCKING FOREGROUND")
+        Log.d("MyServices", "IM IN THE FOREGROUND")
 
+        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
+        accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
+        gyroscope= sensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE)
+
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+
+
+        emergencyAlertManager = EmergencyAlertManager(this)
+
+
+        val channelId = "your_channel_id"
+        val channelName = "Your Channel Name"
+        val channelDescription = "Your Channel Description"
+        val importance = NotificationManager.IMPORTANCE_DEFAULT
+
+        val channel = NotificationChannel(channelId, channelName, importance)
+        channel.description = channelDescription
+
+        // Register the channel with the system
+        val notificationManager = getSystemService(NotificationManager::class.java)
+        notificationManager?.createNotificationChannel(channel)
+
+        job = CoroutineScope(Dispatchers.Default).launch {
+            while (true) {
+                val notification = Notification.Builder(this@MyServices, "your_channel_id")
+                    .setContentTitle("Your Service is Running")
+                    .setContentText("Collecting Sensor Data")
+                    .build()
+
+                startForeground(1, notification)
+                delay(1000) // Set the interval in milliseconds
+//                println(sensorManager)
+                println("Printing every 1 second in the loop")
+                Log.d("MyServices", "IM IN THE FOREGROUND")
+
+                unRegisterListeners()
+                registerListeners()
+                val powerManager = getSystemService(Context.POWER_SERVICE) as PowerManager
+                wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "MyApp::MyWakelockTag")
+                wakeLock.acquire(2000)
+            }
+        }
         // Obsługa kliknięcia przycisku
 //        startEmergencyButton.setOnClickListener {
         // Rozpocznij alert w przypadku kliknięcia przycisku
@@ -151,6 +192,8 @@ class MyServices: Service(),SensorEventListener {
                     val values = "X: $x\nY: $y\nZ: $z"
                     Log.d("Acc Values","Accelerometer Values:\n$values")
                 }
+                sensorManager.unregisterListener(this, accelerometer)
+
             }
 
             Sensor.TYPE_GYROSCOPE -> {
@@ -166,6 +209,8 @@ class MyServices: Service(),SensorEventListener {
                     val values = "X: $x\nY: $y\nZ: $z"
                     Log.d("Gyro Values","Gyroscope Values:\n$values")
                 }
+                sensorManager.unregisterListener(this, gyroscope)
+
             }
         }
     }
