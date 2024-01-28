@@ -228,7 +228,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
     private fun personNotSave() {
         if (hasAccValueChanged(currentAccX, currentAccY, currentAccZ) && hasGyroValueChanged(currentGyroX, currentGyroY, currentGyroZ)) {
-            emergencyAlertManager.startEmergencyAlert(10000, phoneNumber)
+            emergencyAlertManager.startEmergencyAlert(10000, phoneNumber, lastSeenLocation)
         }
     }
 }
