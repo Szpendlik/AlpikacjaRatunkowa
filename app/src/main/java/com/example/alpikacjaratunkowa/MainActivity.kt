@@ -3,7 +3,6 @@ package com.example.alpikacjaratunkowa
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -123,7 +122,7 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 override fun onLocationResult(p0: LocationResult) {
                     for (location in p0.locations){
                         print("Location UPdate")
-                        gpsValues.text = location.toString()
+                        gpsValues.text = SMSMessageUtils.getCity(location.latitude, location.longitude, this@MainActivity)
                     }
                 }
             }
