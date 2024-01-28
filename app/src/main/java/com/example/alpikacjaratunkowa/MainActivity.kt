@@ -3,6 +3,7 @@ package com.example.alpikacjaratunkowa
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
@@ -26,6 +27,8 @@ import com.google.android.gms.location.Priority
 
 class MainActivity : AppCompatActivity(), SensorEventListener {
 
+    private var thresholdAcc: Float = 0.5f
+    private var thresholdGyro: Float = 0.5f
     private var lastAccX:Float = 0f
     private var lastAccY:Float = 0f
     private var lastAccZ:Float = 0f
@@ -33,6 +36,15 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     private var lastGyroY:Float = 0f
     private var lastGyroZ:Float = 0f
     private var lastSeenLocation: Location? = null
+    private var phoneNumber:String = "888119218"
+    private var currentAccX:Float = 0f
+    private var currentAccY:Float = 0f
+    private var currentAccZ:Float = 0f
+    private var currentGyroX:Float = 0f
+    private var currentGyroY:Float = 0f
+    private var currentGyroZ:Float = 0f
+
+
 
     private lateinit var sensorManager: SensorManager
     private val accelerometer: Sensor? = null
@@ -48,11 +60,12 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        startService(Intent(this,MyServices::class.java))
 
         accelerometerValues = findViewById(R.id.accelerometerValues)
         gyroscopeValues = findViewById(R.id.gyroscopeValues)
         gpsValues = findViewById(R.id.gpsValues)
-        startEmergencyButton = findViewById(R.id.startEmergencyButton)
+//        startEmergencyButton = findViewById(R.id.startEmergencyButton)
 
         val sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -76,11 +89,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
 
         // Obsługa kliknięcia przycisku
-        startEmergencyButton.setOnClickListener {
+//        startEmergencyButton.setOnClickListener {
             // Rozpocznij alert w przypadku kliknięcia przycisku
-            emergencyAlertManager.startEmergencyAlert(10000, "507480247", lastSeenLocation)
-        }
-
+//            emergencyAlertManager.startEmergencyAlert(10000, "lastSeenLocation")
+//        }
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.SEND_SMS
@@ -138,12 +150,16 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     override fun onSensorChanged(event: SensorEvent) {
         when(event.sensor.type){
             Sensor.TYPE_ACCELEROMETER -> {
+
+                currentAccX = event.values[0]
+                currentAccY = event.values[1]
+                currentAccZ = event.values[2]
+
                 val x = event.values[0]
                 val y = event.values[1]
                 val z = event.values[2]
 
-
-                if (hasAccValueChanged(x, y, z)){
+                if (hasAccValueChanged(x, y, z)) {
                     val values = "X: $x\nY: $y\nZ: $z"
                     accelerometerValues.text = "Accelerometer Values:\n$values"
                 }
@@ -152,6 +168,10 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
                 val x = event.values[0]
                 val y = event.values[1]
                 val z = event.values[2]
+
+                currentGyroX = event.values[0]
+                currentGyroY = event.values[1]
+                currentGyroZ = event.values[2]
 
                 if (hasGyroValueChanged(x, y, z)){
                     val values = "X: $x\nY: $y\nZ: $z"
@@ -171,14 +191,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
     }
 
     private fun hasAccValueChanged(x:Float, y:Float, z:Float):Boolean{
-        val threshold = 0.5f // Adjust this threshold based on your sensitivity requirements
 
         val deltaX = Math.abs(x - lastAccX)
         val deltaY = Math.abs(y - lastAccY)
         val deltaZ = Math.abs(z - lastAccZ)
 
         // Check if any of the differences is greater than the threshold
-        if (deltaX > threshold || deltaY > threshold || deltaZ > threshold) {
+        if (deltaX > thresholdAcc || deltaY > thresholdAcc || deltaZ > thresholdAcc) {
             // Values have changed
             lastAccX = x
             lastAccY = y
@@ -190,14 +209,13 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
         return false
     }
     private fun hasGyroValueChanged(x:Float, y:Float, z:Float):Boolean{
-        val threshold = 0.5f // Adjust this threshold based on your sensitivity requirements
 
         val deltaX = Math.abs(x - lastGyroX)
         val deltaY = Math.abs(y - lastGyroY)
         val deltaZ = Math.abs(z - lastGyroZ)
 
         // Check if any of the differences is greater than the threshold
-        if (deltaX > threshold || deltaY > threshold || deltaZ > threshold) {
+        if (deltaX > thresholdGyro || deltaY > thresholdGyro || deltaZ > thresholdGyro) {
             // Values have changed
             lastGyroX = x
             lastGyroY = y
@@ -207,6 +225,11 @@ class MainActivity : AppCompatActivity(), SensorEventListener {
 
         // Values have not changed
         return false
+    }
+    private fun personNotSave() {
+        if (hasAccValueChanged(currentAccX, currentAccY, currentAccZ) && hasGyroValueChanged(currentGyroX, currentGyroY, currentGyroZ)) {
+            emergencyAlertManager.startEmergencyAlert(10000, phoneNumber)
+        }
     }
 }
 
