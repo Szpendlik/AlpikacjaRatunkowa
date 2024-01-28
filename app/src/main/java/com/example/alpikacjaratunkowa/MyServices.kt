@@ -113,6 +113,8 @@ class MyServices: Service(),SensorEventListener {
         val notificationManager = getSystemService(NotificationManager::class.java)
         notificationManager?.createNotificationChannel(channel)
 
+        registerListeners()
+
         job = CoroutineScope(Dispatchers.Default).launch {
             while (true) {
                 val notification = Notification.Builder(this@MyServices, "your_channel_id")
@@ -126,7 +128,6 @@ class MyServices: Service(),SensorEventListener {
                 println("Printing every 1 second in the loop")
                 Log.d("MyServices", "IM IN THE FOREGROUND")
 
-                registerListeners()
             }
         }
         // Obsługa kliknięcia przycisku
@@ -185,7 +186,6 @@ class MyServices: Service(),SensorEventListener {
                     val values = "X: $x\nY: $y\nZ: $z"
                     Log.d("Acc Values","Accelerometer Values:\n$values")
                 }
-                sensorManager.unregisterListener(this, accelerometer)
 
             }
 
@@ -202,7 +202,6 @@ class MyServices: Service(),SensorEventListener {
                     val values = "X: $x\nY: $y\nZ: $z"
                     Log.d("Gyro Values","Gyroscope Values:\n$values")
                 }
-                sensorManager.unregisterListener(this, gyroscope)
 
             }
         }
