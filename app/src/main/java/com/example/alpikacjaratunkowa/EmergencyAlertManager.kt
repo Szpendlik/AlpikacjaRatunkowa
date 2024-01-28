@@ -3,8 +3,13 @@ package com.example.alpikacjaratunkowa
 
 import android.content.Context
 import android.content.Intent
+
 import android.media.MediaPlayer
 import android.os.Build
+
+import android.location.Location
+import android.os.Bundle
+
 import android.os.CountDownTimer
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -17,17 +22,21 @@ class EmergencyAlertManager(private val context: Context) {
     private lateinit var alertTimer: CountDownTimer
     private var isAlertShown = false
 
-    fun startEmergencyAlert(countdownDuration: Long, phoneNumber: String) {
+    fun startEmergencyAlert(countdownDuration: Long, phoneNumber: String, lastSeenLocation: Location?) {
         if (!isAlertShown) {
-            showAlert(countdownDuration, phoneNumber)
+            showAlert(countdownDuration, phoneNumber, null, lastSeenLocation)
         }
     }
 
-    private fun showAlert(countdownDuration: Long, phoneNumber: String) {
+
+
+    private fun showAlert(countdownDuration: Long, phoneNumber: String, reason: String?, location: Location?) {
         // Dostosowanie stylu okna alertu
         val alertDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
+
+
             .setTitle("Emergency Alert")
-            .setMessage("Czy potrzebujesz pomocy? Kliknij OK, aby anulować.")
+            .setMessage("Wykryto $reason. Czy potrzebujesz pomocy? Kliknij OK, aby anulować.")
             .setCancelable(false)
             .setPositiveButton("OK") { _, _ ->
                 cancelAlert()
@@ -38,12 +47,12 @@ class EmergencyAlertManager(private val context: Context) {
             override fun onTick(millisUntilFinished: Long) {
                 // Wyświetlanie pozostałego czasu
                 val secondsRemaining = millisUntilFinished / 1000
-                alertDialog.setMessage("Czy potrzebujesz pomocy? Kliknij OK, aby anulować. Pozostały czas: $secondsRemaining s")
+                alertDialog.setMessage("Wykryto $reason. Czy potrzebujesz pomocy? Kliknij OK, aby anulować. Pozostały czas: $secondsRemaining s")
             }
 
             override fun onFinish() {
                 // Automatyczne wysłanie SMS-a po zakończeniu odliczania
-                sendEmergencySMS(phoneNumber)
+                sendEmergencySMS(phoneNumber, reason, location)
                 alertDialog.dismiss()
                 isAlertShown = false
             }
@@ -84,12 +93,7 @@ class EmergencyAlertManager(private val context: Context) {
         Toast.makeText(context, "Alert anulowany", Toast.LENGTH_SHORT).show()
     }
 
-    private fun sendEmergencySMS(phoneNumber: String) {
-        val smsManager = SmsManager.getDefault()
-        val message = "Pomusz mi proszę"
-        smsManager.sendTextMessage(phoneNumber, null, message, null, null)
-        Toast.makeText(context, "SMS wysłany", Toast.LENGTH_SHORT).show()
-    }
+
 
     private var mediaPlayer: MediaPlayer? = null
 
@@ -116,5 +120,37 @@ class EmergencyAlertManager(private val context: Context) {
     private fun stopVibration() {
         val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibrator.cancel()
+
+    private fun sendEmergencySMS(phoneNumber: String, reason: String?, location: Location?) {
+
+            val smsManager = SmsManager.getDefault()
+        var message: String
+        val stringBuilder = StringBuilder()
+        val stringBuilder2 = StringBuilder()
+        val stringBuilder3 = StringBuilder()
+        if (reason != null) {
+            stringBuilder.append("My Accident Detection App has detected a potential accident ($reason). ")
+        } else {
+            stringBuilder.append("My Accident Detection App has detected a potential accident. ")
+        }
+        if (location != null){
+            stringBuilder2.append("Location: ${location.latitude}, ${location.longitude}")
+            stringBuilder3.append(SMSMessageUtils.getCity(location.latitude, location.longitude, context))
+        }
+        stringBuilder.append("Please check on me immediately. " +
+                "If no response, please contact emergency services. ")
+        println(stringBuilder.toString())
+        val stringMessage : String = stringBuilder.toString()
+        val stringMessage2 : String = stringBuilder2.toString()
+        val stringMessage3 : String = stringBuilder3.toString()
+
+        smsManager.sendTextMessage(phoneNumber, null, stringMessage, null, null)
+        smsManager.sendTextMessage(phoneNumber, null, stringMessage2, null, null)
+        smsManager.sendTextMessage(phoneNumber, null, stringMessage3, null, null)
+        Toast.makeText(context, "SMS has been sended", Toast.LENGTH_SHORT).show()
+
+
+    
+
     }
 }
