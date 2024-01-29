@@ -33,6 +33,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.os.Build
+import androidx.core.app.NotificationCompat
 
 import kotlin.math.abs
 
@@ -283,9 +286,34 @@ override fun onDestroy() {
             isAlreadyNotSafe = true
             phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
             alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
-//        startActivity(Intent(this, MainActivity::class.java))
             Log.d("PersonNotSafe", "Making notification")
-        var notificationIntent = Intent(this, MainActivity::class.java)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val NOTIFICATION_CHANNEL_ID = "com.currency.usdtoinr"
+                val channelName = "My Background Service"
+                val chan = NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE)
+                chan.lightColor = Color.BLUE
+                chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+                val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                manager.createNotificationChannel(chan)
+
+                val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                val notification = notificationBuilder.setOngoing(true)
+                    .setContentTitle("")
+                    .setPriority(NotificationManager.IMPORTANCE_MIN)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .build()
+                startForeground(2, notification)
+
+                val dialogIntent = Intent(this, AlertActivity::class.java)
+                dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                startActivity(dialogIntent)
+                Log.d("sk", "After startforeground executed")
+
+            } else {
+
+            var notificationIntent = Intent(this, MainActivity::class.java)
+
+
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
 
             Log.d("PersonNotSafe", "Notification bilder")
@@ -302,15 +330,10 @@ override fun onDestroy() {
         dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             Log.d("PersonNotSafe", "before activity start")
         startActivity(dialogIntent)
+            }
 //        emergencyAlertManager.startEmergencyAlert(alertDuration, phoneNumber, lastSeenLocation)
 //        Log.d("PersonNotSafe", "Safe")
 
-
-
-//            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-//            val wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP, "Tag")
-//            wakeLock.acquire()
-            Log.d("PersonNotSafe", "NotSafe")
         }
 
     }
