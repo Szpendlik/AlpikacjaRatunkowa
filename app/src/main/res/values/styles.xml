@@ -2,7 +2,12 @@
 <resources>
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowBackground">@drawable/alert_dialog_bg</item>
-        <item name="android:colorAccent">@color/alert_button_color</item>
+        <item name="android:colorAccent">@color/winterButtonBackground</item>
         <!-- Dodaj inne atrybuty stylu -->
     </style>
+    <style name="Widget.App.Button" parent="Widget.AppCompat.Button.Colored">
+        <item name="android:background">@drawable/button_background</item>
+        <item name="android:textColor">@color/winterButtonText</item>
+    </style>
+
 </resources>

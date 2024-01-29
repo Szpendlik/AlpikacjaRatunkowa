@@ -3,4 +3,19 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="alert_button_color">#FF4081</color>
+    <color name="winterBackground">#B3E0F5</color>
+    <color name="winterIconTint">#FFFFFF</color>
+    <color name="winterText">#FFFFFF</color>
+    <color name="winterHintText">#B0BEC5</color>
+    <color name="winterButtonBackground">#3F51B5</color>
+    <color name="winterButtonText">#FFFFFF</color>
+    <color name="winterEditTextBackground">#B3E0F5</color>
+    <color name="winterEditTextOutline">#497E97</color>
+    <color name="winterEditTextBackgroundFocused">#B3E0F5</color>
+    <color name="winterEditTextOutlineFocused">#3F51B5</color>
+    <color name="winterEditTextBackgroundPressed">#3F51B5</color>
+    <color name="winterEditTextOutlinePressed">#FFFFFF</color>
+    <color name="buttonDisabledBackground">#CCCCCC</color>
+    <color name="buttonDisabledText">#888888</color>
+    <color name="editTextBackground">#4C9ABD</color>
 </resources>

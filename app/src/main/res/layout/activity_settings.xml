@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingsActivity"
+    android:background="@drawable/bg">
+
+
+
+    <TextView
+        android:id="@+id/textViewAlertDuration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:text="Czas trwania alertu (ms)"
+        android:textColor="@color/winterText"
+        app:layout_constraintBottom_toTopOf="@+id/alertDurationEditText"
+        app:layout_constraintEnd_toEndOf="@+id/alertDurationEditText"
+        app:layout_constraintHorizontal_bias="0.529"
+        app:layout_constraintStart_toStartOf="@+id/alertDurationEditText" />
+
+    <EditText
+        android:id="@+id/phoneNumberEditText"
+        android:layout_width="205dp"
+        android:layout_height="38dp"
+        android:layout_marginBottom="4dp"
+        android:background="@color/editTextBackground"
+        android:hint="Wpisz numer telefonu"
+        android:textColorHint="@color/winterHintText"
+
+        android:inputType="phone"
+        android:padding="8dp"
+        android:textColor="@color/winterText"
+        app:layout_constraintBottom_toTopOf="@+id/saveButton"
+        app:layout_constraintEnd_toEndOf="@+id/saveButton"
+        app:layout_constraintStart_toStartOf="@+id/saveButton" />
+
+    <TextView
+        android:id="@+id/textViewPhoneNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:text="Numer telefonu"
+        android:textColor="@color/winterText"
+        app:layout_constraintBottom_toTopOf="@+id/phoneNumberEditText"
+        app:layout_constraintEnd_toEndOf="@+id/phoneNumberEditText"
+        app:layout_constraintHorizontal_bias="0.509"
+        app:layout_constraintStart_toStartOf="@+id/phoneNumberEditText" />
+
+    <EditText
+        android:id="@+id/alertDurationEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:background="@color/editTextBackground"
+        android:hint="Wpisz czas trwania alertu"
+        android:textColorHint="@color/winterHintText"
+
+        android:inputType="number"
+        android:padding="8dp"
+        android:textColor="@color/winterText"
+        app:layout_constraintBottom_toTopOf="@+id/textViewPhoneNumber"
+        app:layout_constraintEnd_toEndOf="@+id/phoneNumberEditText"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="@+id/phoneNumberEditText" />
+
+    <Button
+        android:id="@+id/saveButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="180dp"
+        android:background="@drawable/button_background"
+        android:onClick="saveSettings"
+        android:text="Zapisz"
+        android:textColor="@color/buttonDisabledText"
+        android:enabled="false"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.493"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

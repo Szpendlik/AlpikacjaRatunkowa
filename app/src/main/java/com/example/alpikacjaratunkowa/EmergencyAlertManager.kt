@@ -120,7 +120,7 @@ class EmergencyAlertManager(private val context: Context) {
     private fun stopVibration() {
         val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibrator.cancel()
-
+    }
     private fun sendEmergencySMS(phoneNumber: String, reason: String?, location: Location?) {
 
             val smsManager = SmsManager.getDefault()

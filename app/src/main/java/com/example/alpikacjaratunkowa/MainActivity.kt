@@ -25,12 +25,15 @@ import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 
 
-class MainActivity : AppCompatActivity(){
+
+
+class MainActivity : AppCompatActivity() {
     private lateinit var accelerometerValues: TextView
     private lateinit var gyroscopeValues: TextView
     private lateinit var gpsValues: TextView
     private lateinit var emergencyAlertManager: EmergencyAlertManager
     private lateinit var startEmergencyButton: Button
+    private lateinit var settingsButton: Button
 
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,14 +44,11 @@ class MainActivity : AppCompatActivity(){
         accelerometerValues = findViewById(R.id.accelerometerValues)
         gyroscopeValues = findViewById(R.id.gyroscopeValues)
         gpsValues = findViewById(R.id.gpsValues)
+        settingsButton = findViewById(R.id.settingsButton)
 
-
-        // Obsługa kliknięcia przycisku
-        startEmergencyButton.setOnClickListener {
-            // Rozpocznij alert w przypadku kliknięcia przycisku
-            emergencyAlertManager.startEmergencyAlert(10000, "790326216")
+        settingsButton.setOnClickListener {
+            openSettingsActivity()
         }
-
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -58,13 +58,10 @@ class MainActivity : AppCompatActivity(){
                 Manifest.permission.SEND_SMS
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d("NOHOMO", "NOHOMO")
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf<String>(
-
-                    Manifest.permission.SEND_SMS
-                ), 2
+                arrayOf<String>(Manifest.permission.SEND_SMS),
+                2
             )
         }
 
@@ -76,18 +73,12 @@ class MainActivity : AppCompatActivity(){
                 Manifest.permission.VIBRATE
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d("NOHOMO", "NOHOMO")
             ActivityCompat.requestPermissions(
                 this,
-                arrayOf<String>(
-
-                    Manifest.permission.VIBRATE
-                ), 3
+                arrayOf<String>(Manifest.permission.VIBRATE),
+                3
             )
         }
-
-
-
 
         if (ActivityCompat.checkSelfPermission(
                 this,
@@ -97,17 +88,20 @@ class MainActivity : AppCompatActivity(){
                 Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         ) {
-            Log.d("NOHOMO", "NOHOMO")
             ActivityCompat.requestPermissions(
                 this,
                 arrayOf<String>(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
-
                 ),
                 1
             )
             return
         }
+    }
+
+    private fun openSettingsActivity() {
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
     }
 }
