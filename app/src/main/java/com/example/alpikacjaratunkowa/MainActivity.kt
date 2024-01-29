@@ -2,27 +2,14 @@ package com.example.alpikacjaratunkowa
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
-import android.location.Location
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import android.os.Looper
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
-import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 
 
 
@@ -35,6 +22,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var startEmergencyButton: Button
     private lateinit var settingsButton: Button
 
+//    fun startMyService(){
+//        startService(Intent(this, MyServices::class.java))
+//    }
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,12 +34,19 @@ class MainActivity : AppCompatActivity() {
         accelerometerValues = findViewById(R.id.accelerometerValues)
         gyroscopeValues = findViewById(R.id.gyroscopeValues)
         gpsValues = findViewById(R.id.gpsValues)
+
         settingsButton = findViewById(R.id.settingsButton)
 
         settingsButton.setOnClickListener {
             openSettingsActivity()
         }
 
+//        startEmergencyButton = findViewById(R.id.startEmergencyButton)
+//        startMyService()
+//        startEmergencyButton.setOnClickListener {
+//            startMyService()
+//
+//        }
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.SEND_SMS

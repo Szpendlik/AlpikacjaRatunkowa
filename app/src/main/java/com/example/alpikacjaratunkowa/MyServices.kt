@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
@@ -56,6 +57,9 @@ class MyServices : Service(), SensorEventListener {
     private var currentGyroX: Float = 0f
     private var currentGyroY: Float = 0f
     private var currentGyroZ: Float = 0f
+    private var hasGyroChanged :Boolean = false
+    private var hasAccChanged :Boolean = false
+
 
     private lateinit var sensorManager: SensorManager
     private var accelerometer: Sensor? = null
@@ -148,76 +152,79 @@ class MyServices : Service(), SensorEventListener {
 //        }
 
 
-        val locationRequest =
-            LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).build()
-        val locationCallback = object : LocationCallback() {
-            override fun onLocationResult(p0: LocationResult) {
-                for (location in p0.locations) {
-                    lastSeenLocation = location
-//                    Log.d("GPS",SMSMessageUtils.getCity(
-//                        location.latitude,
-//                        location.longitude,
-//                        this@MyServices
-//                    )
-//                    )
+            val locationRequest =
+                LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000).build()
+            val locationCallback = object : LocationCallback() {
+                override fun onLocationResult(p0: LocationResult) {
+                    for (location in p0.locations) {
+                        lastSeenLocation = location
+                        Log.d("GPS",SMSMessageUtils.getCity(
+                            location.latitude,
+                            location.longitude,
+                            this@MyServices
+                        )
+                        )
+                    }
                 }
-
             }
-        }
+        if (ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ){}
+        fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
 
-
-    if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-    ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
-    ) {}
-
-    fusedLocationClient.requestLocationUpdates(locationRequest, locationCallback, Looper.getMainLooper())
-
-    return super.onStartCommand(intent, flags, startId)
-}
-
-@SuppressLint("SetTextI18n")
-override fun onSensorChanged(event: SensorEvent) {
-    when (event.sensor.type) {
-        Sensor.TYPE_ACCELEROMETER -> {
-            currentAccX = event.values[0]
-            currentAccY = event.values[1]
-            currentAccZ = event.values[2]
-
-            val x = event.values[0]
-            val y = event.values[1]
-            val z = event.values[2]
-
-            if (hasAccValueChanged(x, y, z)) {
-                val values = "X: $x\nY: $y\nZ: $z"
-              //  Log.d("Acc Values", "Accelerometer Values:\n$values")
-            }
-
-        }
-
-        Sensor.TYPE_GYROSCOPE -> {
-            val x = event.values[0]
-            val y = event.values[1]
-            val z = event.values[2]
-
-            currentGyroX = event.values[0]
-            currentGyroY = event.values[1]
-            currentGyroZ = event.values[2]
-
-            if (hasGyroValueChanged(x, y, z)) {
-                val values = "X: $x\nY: $y\nZ: $z"
-               // Log.d("Gyro Values", "Gyroscope Values:\n$values")
-            }
-
-        }
+            return super.onStartCommand(intent, flags, startId)
     }
 
-    // Pobieranie numeru telefonu i czasu alertu w każdym cyklu
-    phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
-    alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
-    Log.d("MyServices", "time: $alertDuration")
-    Log.d("MyServices", "Current Phone Number: $phoneNumber")
+    @SuppressLint("SetTextI18n")
+    override fun onSensorChanged(event: SensorEvent) {
+        when (event.sensor.type) {
+            Sensor.TYPE_ACCELEROMETER -> {
 
-}
+                currentAccX = event.values[0]
+                currentAccY = event.values[1]
+                currentAccZ = event.values[2]
+
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2]
+
+//                if (hasAccValueChanged(x, y, z)) {
+//                    val values = "X: $x\nY: $y\nZ: $z"
+//                    Log.d("Acc Values","Accelerometer Values:\n$values")
+//                }
+                hasAccValueChanged(currentAccX, currentAccY, currentAccZ)
+            }
+
+            Sensor.TYPE_GYROSCOPE -> {
+                val x = event.values[0]
+                val y = event.values[1]
+                val z = event.values[2]
+
+                currentGyroX = event.values[0]
+                currentGyroY = event.values[1]
+                currentGyroZ = event.values[2]
+
+//                if (hasGyroValueChanged(x, y, z)) {
+//                    val values = "X: $x\nY: $y\nZ: $z"
+//                    Log.d("Gyro Values","Gyroscope Values:\n$values")
+//                }
+                hasGyroValueChanged(currentGyroX, currentGyroY, currentGyroZ)
+
+            }
+        }
+
+
+        personNotSave()
+    }
 
 override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
     SensorManager.SENSOR_STATUS_ACCURACY_HIGH
@@ -229,65 +236,82 @@ override fun onDestroy() {
         sensorManager.unregisterListener(this)
     }
 }
-
-private fun hasAccValueChanged(x: Float, y: Float, z: Float): Boolean {
-
-
-    val deltaX = abs(x - lastAccX)
-    val deltaY = abs(y - lastAccY)
-    val deltaZ = abs(z - lastAccZ)
+    private fun hasAccValueChanged(x: Float, y: Float, z: Float) {
 
 
-    if (deltaX > thresholdAcc || deltaY > thresholdAcc || deltaZ > thresholdAcc) {
-        lastAccX = x
-        lastAccY = y
-        lastAccZ = z
-        return true
+        val deltaX = abs(x - lastAccX)
+        val deltaY = abs(y - lastAccY)
+        val deltaZ = abs(z - lastAccZ)
+        // Check if any of the differences is greater than the threshold
+        if (deltaX > thresholdAcc || deltaY > thresholdAcc || deltaZ > thresholdAcc) {
+            // Values have changed
+            lastAccX = x
+            lastAccY = y
+            lastAccZ = z
+            hasAccChanged = true
+            return
+        }
+
+        // Values have not changed
+        hasAccChanged = false
+        return
     }
 
-    return false
-}
+    private fun hasGyroValueChanged(x: Float, y: Float, z: Float) {
 
-private fun hasGyroValueChanged(x: Float, y: Float, z: Float): Boolean {
+        val deltaX = abs(x - lastGyroX)
+        val deltaY = abs(y - lastGyroY)
+        val deltaZ = abs(z - lastGyroZ)
 
+        // Check if any of the differences is greater than the threshold
+        if (deltaX > thresholdGyro || deltaY > thresholdGyro || deltaZ > thresholdGyro) {
+            // Values have changed
+            lastGyroX = x
+            lastGyroY = y
+            lastGyroZ = z
+            hasGyroChanged = true
+            return
+        }
 
-    val deltaX = abs(x - lastGyroX)
-    val deltaY = abs(y - lastGyroY)
-    val deltaZ = abs(z - lastGyroZ)
-
-
-    if (deltaX > thresholdGyro || deltaY > thresholdGyro || deltaZ > thresholdGyro) {
-        lastGyroX = x
-        lastGyroY = y
-        lastGyroZ = z
-        return true
+        // Values have not changed
+        hasGyroChanged =  false
+        return
     }
 
-    return false
-}
+    @SuppressLint("InvalidWakeLockTag")
+    private fun personNotSave() {
+        if(hasGyroChanged && hasAccChanged) {
+            //        // Pobieranie numeru telefonu i czasu alertu w każdym cyklu
+//        phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
+//        alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
+//        Log.d("MyServices", "time: $alertDuration")
+//        Log.d("MyServices", "Current Phone Number: $phoneNumber")
+////        startActivity(Intent(this, MainActivity::class.java))
+//        var notificationIntent = Intent(this, MainActivity::class.java)
+//        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
+//
+//        var notification = Notification.Builder(this, "your_channel_id")
+//            .setContentTitle("")
+//            .setContentText("")
+//            .setContentIntent(pendingIntent)
+//            .setTicker("")
+//            .build()
+//
+//        startForeground(2, notification)
+//        val dialogIntent = Intent(this, MainActivity::class.java)
+//        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+//        startActivity(dialogIntent)
+//        emergencyAlertManager.startEmergencyAlert(10000, phoneNumber, lastSeenLocation)
+//        Log.d("PersonNotSafe", "Safe")
 
 
-@SuppressLint("InvalidWakeLockTag")
-private fun personNotSave() {
-    if (hasAccValueChanged(currentAccX, currentAccY, currentAccZ) && hasGyroValueChanged(
-            currentGyroX,
-            currentGyroY,
-            currentGyroZ
-        )
-    ) {
 
-        Log.d("MyServices", "Person not safe. Initiating emergency alert.")
-        // Wartości zmiennych, które mogą być używane w emergencyAlertManager.startEmergencyAlert(...)
-        Log.d("MyServices", "Current Location: $lastSeenLocation")
-        Log.d("MyServices", "Current Phone Number: $phoneNumber")
-        emergencyAlertManager.startEmergencyAlert(alertDuration, phoneNumber, lastSeenLocation)
-
-
-        val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
-        val wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP, "Tag")
-        wakeLock.acquire()
+//            val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
+//            val wakeLock = pm.newWakeLock(PowerManager.SCREEN_BRIGHT_WAKE_LOCK or PowerManager.FULL_WAKE_LOCK or PowerManager.ACQUIRE_CAUSES_WAKEUP, "Tag")
+//            wakeLock.acquire()
+            Log.d("PersonNotSafe", "NotSafe")
+        }
 
     }
-}
 }
 

@@ -56,21 +56,14 @@
 
         />
 
-
-
-
-
-
-
-
-    <!--    <Button-->
-<!--        android:id="@+id/startEmergencyButton"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:text="Start Emergency"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/gpsValues" />-->
+    <Button
+        android:id="@+id/startEmergencyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Start Emergency"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/gpsValues" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
