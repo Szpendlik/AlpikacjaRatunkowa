@@ -15,7 +15,6 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
-import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
@@ -39,7 +38,7 @@ import kotlin.math.abs
 
 
 class MyServices : Service(), SensorEventListener {
-
+    private var isAlreadyNotSafe = false;
     private var thresholdAcc: Float = 20.0f
     private var thresholdGyro: Float = 5.0f
     private var lastAccX: Float = 0f
@@ -280,28 +279,30 @@ override fun onDestroy() {
 
     @SuppressLint("InvalidWakeLockTag")
     private fun personNotSave() {
-        if(hasGyroChanged && hasAccChanged) {
-            //        // Pobieranie numeru telefonu i czasu alertu w każdym cyklu
-//        phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
-//        alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
-//        Log.d("MyServices", "time: $alertDuration")
-//        Log.d("MyServices", "Current Phone Number: $phoneNumber")
-////        startActivity(Intent(this, MainActivity::class.java))
-//        var notificationIntent = Intent(this, MainActivity::class.java)
-//        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
-//
-//        var notification = Notification.Builder(this, "your_channel_id")
-//            .setContentTitle("")
-//            .setContentText("")
-//            .setContentIntent(pendingIntent)
-//            .setTicker("")
-//            .build()
-//
-//        startForeground(2, notification)
-//        val dialogIntent = Intent(this, MainActivity::class.java)
-//        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-//        startActivity(dialogIntent)
-//        emergencyAlertManager.startEmergencyAlert(10000, phoneNumber, lastSeenLocation)
+        if(hasGyroChanged && hasAccChanged && !isAlreadyNotSafe) {
+            isAlreadyNotSafe = true
+            phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
+            alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
+//        startActivity(Intent(this, MainActivity::class.java))
+            Log.d("PersonNotSafe", "Making notification")
+        var notificationIntent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
+
+            Log.d("PersonNotSafe", "Notification bilder")
+        var notification = Notification.Builder(this, "your_channel_id")
+            .setContentTitle("")
+            .setContentText("")
+            .setContentIntent(pendingIntent)
+            .setTicker("")
+            .build()
+
+        startForeground(2, notification)
+            Log.d("PersonNotSafe", "Crerate activiti")
+        val dialogIntent = Intent(this, AlertActivity::class.java)
+        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            Log.d("PersonNotSafe", "before activity start")
+        startActivity(dialogIntent)
+//        emergencyAlertManager.startEmergencyAlert(alertDuration, phoneNumber, lastSeenLocation)
 //        Log.d("PersonNotSafe", "Safe")
 
 

@@ -2,18 +2,16 @@ package com.example.alpikacjaratunkowa
 
 
 import android.content.Context
-import android.content.Intent
 
 import android.media.MediaPlayer
-import android.os.Build
 
 import android.location.Location
-import android.os.Bundle
 
 import android.os.CountDownTimer
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.telephony.SmsManager
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.appcompat.app.AlertDialog
@@ -24,6 +22,7 @@ class EmergencyAlertManager(private val context: Context) {
 
     fun startEmergencyAlert(countdownDuration: Long, phoneNumber: String, lastSeenLocation: Location?) {
         if (!isAlertShown) {
+            Log.d("ALERT", "Goedemorgen")
             showAlert(countdownDuration, phoneNumber, null, lastSeenLocation)
         }
     }

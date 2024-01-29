@@ -1,13 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name="AlertDialogTheme" parent="Theme.AppCompat.Light.Dialog.Alert">
         <item name="android:windowBackground">@drawable/alert_dialog_bg</item>
         <item name="android:colorAccent">@color/winterButtonBackground</item>
         <!-- Dodaj inne atrybuty stylu -->
     </style>
+
     <style name="Widget.App.Button" parent="Widget.AppCompat.Button.Colored">
         <item name="android:background">@drawable/button_background</item>
         <item name="android:textColor">@color/winterButtonText</item>
+    </style>
+
+    <style name="Widget.Theme.AlpikacjaRatunkowa.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
+        <item name="android:background">@color/black_overlay</item>
+    </style>
+
+    <style name="Widget.Theme.AlpikacjaRatunkowa.ButtonBar.Fullscreen" parent="">
+        <item name="android:background">@color/black_overlay</item>
+        <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
     </style>
 
 </resources>
