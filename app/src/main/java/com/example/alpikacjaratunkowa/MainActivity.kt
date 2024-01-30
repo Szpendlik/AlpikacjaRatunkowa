@@ -31,9 +31,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         startService(Intent(this, MyServices::class.java))
 
-        accelerometerValues = findViewById(R.id.accelerometerValues)
-        gyroscopeValues = findViewById(R.id.gyroscopeValues)
-        gpsValues = findViewById(R.id.gpsValues)
 
         settingsButton = findViewById(R.id.settingsButton)
 
