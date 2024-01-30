@@ -6,8 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AlertScreenActivity"
-    android:background="@drawable/bg3">
-
+    android:background="@drawable/bg3"
+    android:id="@+id/constraintLayout">
+    a
 
     <Button
         android:id="@+id/callFriendNumber"

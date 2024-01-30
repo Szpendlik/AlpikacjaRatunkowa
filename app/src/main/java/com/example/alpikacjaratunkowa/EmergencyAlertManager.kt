@@ -6,7 +6,7 @@ import android.content.Context
 import android.media.MediaPlayer
 
 import android.location.Location
-
+import android.content.SharedPreferences
 import android.os.CountDownTimer
 import android.os.VibrationEffect
 import android.os.Vibrator
@@ -19,6 +19,13 @@ class EmergencyAlertManager(private val context: Context) {
     private lateinit var countDownTimer: CountDownTimer
     private lateinit var alertTimer: CountDownTimer
     private var isAlertShown = false
+    private lateinit var sharedPreferences: SharedPreferences
+    private var switchCount: Int = 1
+
+    init {
+        // Inicjalizacja sharedPreferences w konstruktorze
+        sharedPreferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE)
+    }
 
     fun startEmergencyAlert(countdownDuration: Long, phoneNumber: String, lastSeenLocation: Location?, locationString: String?) {
         if (!isAlertShown) {
@@ -46,7 +53,16 @@ class EmergencyAlertManager(private val context: Context) {
             override fun onTick(millisUntilFinished: Long) {
                 // Wyświetlanie pozostałego czasu
                 val secondsRemaining = millisUntilFinished / 1000
-                alertDialog.setMessage("Wykryto wypadek. Czy potrzebujesz pomocy? Kliknij OK, aby anulować. Pozostały czas: $secondsRemaining s")
+                switchCount = sharedPreferences.getInt("switchCount", 0)
+                if(switchCount == 15)
+                {
+                    alertDialog.setMessage("Do lądowania pozostało: $secondsRemaining s")
+                }
+                else
+                {
+                    alertDialog.setMessage("Wykryto wypadek. Czy potrzebujesz pomocy? Kliknij OK, aby anulować. Pozostały czas: $secondsRemaining s")
+                }
+
             }
 
             override fun onFinish() {
@@ -97,11 +113,24 @@ class EmergencyAlertManager(private val context: Context) {
     private var mediaPlayer: MediaPlayer? = null
 
     private fun playAlertSound() {
-        if (mediaPlayer == null) {
-            mediaPlayer = MediaPlayer.create(context, R.raw.alert_sound)
-            mediaPlayer?.isLooping = true
-            mediaPlayer?.start()
+        switchCount = sharedPreferences.getInt("switchCount", 0)
+        if(switchCount == 15)
+        {
+            if (mediaPlayer == null) {
+                mediaPlayer = MediaPlayer.create(context, R.raw.believe)
+                mediaPlayer?.isLooping = true
+                mediaPlayer?.start()
+            }
         }
+        else
+        {
+            if (mediaPlayer == null) {
+                mediaPlayer = MediaPlayer.create(context, R.raw.alert_sound)
+                mediaPlayer?.isLooping = true
+                mediaPlayer?.start()
+            }
+        }
+
     }
 
     private fun stopAlertSound() {
