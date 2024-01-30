@@ -20,16 +20,16 @@ class EmergencyAlertManager(private val context: Context) {
     private lateinit var alertTimer: CountDownTimer
     private var isAlertShown = false
 
-    fun startEmergencyAlert(countdownDuration: Long, phoneNumber: String, lastSeenLocation: Location?) {
+    fun startEmergencyAlert(countdownDuration: Long, phoneNumber: String, lastSeenLocation: Location?, locationString: String?) {
         if (!isAlertShown) {
             Log.d("ALERT", "Goedemorgen")
-            showAlert(countdownDuration, phoneNumber, null, lastSeenLocation)
+            showAlert(countdownDuration, phoneNumber, null, lastSeenLocation, locationString)
         }
     }
 
 
 
-    private fun showAlert(countdownDuration: Long, phoneNumber: String, reason: String?, location: Location?) {
+    private fun showAlert(countdownDuration: Long, phoneNumber: String, reason: String?, location: Location?, locationString: String?) {
         // Dostosowanie stylu okna alertu
         val alertDialog = AlertDialog.Builder(context, R.style.AlertDialogTheme)
 
@@ -51,7 +51,7 @@ class EmergencyAlertManager(private val context: Context) {
 
             override fun onFinish() {
                 // Automatyczne wysłanie SMS-a po zakończeniu odliczania
-                sendEmergencySMS(phoneNumber, reason, location)
+                sendEmergencySMS(phoneNumber, reason, location, locationString)
                 alertDialog.dismiss()
                 isAlertShown = false
             }
@@ -120,7 +120,7 @@ class EmergencyAlertManager(private val context: Context) {
         val vibrator = context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
         vibrator.cancel()
     }
-    private fun sendEmergencySMS(phoneNumber: String, reason: String?, location: Location?) {
+    private fun sendEmergencySMS(phoneNumber: String, reason: String?, location: Location?, locationString: String?) {
 
             val smsManager = SmsManager.getDefault()
         var message: String
@@ -135,6 +135,13 @@ class EmergencyAlertManager(private val context: Context) {
         if (location != null){
             stringBuilder2.append("Location: ${location.latitude}, ${location.longitude}")
             stringBuilder3.append(SMSMessageUtils.getCity(location.latitude, location.longitude, context))
+        } else if (locationString != null){
+            val parts = locationString.split("/")
+
+            val latitude = parts[0].toDouble()
+            val longitude = parts[1].toDouble()
+            stringBuilder2.append("Location: $latitude, $longitude")
+            stringBuilder3.append(SMSMessageUtils.getCity(latitude, longitude, context))
         }
         stringBuilder.append("Please check on me immediately. " +
                 "If no response, please contact emergency services. ")

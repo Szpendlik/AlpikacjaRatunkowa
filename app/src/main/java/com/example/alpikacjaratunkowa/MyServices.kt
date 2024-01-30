@@ -36,6 +36,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import org.json.JSONStringer
 import java.time.Duration
 import java.time.LocalDateTime
 
@@ -194,6 +195,10 @@ class MyServices : Service(), SensorEventListener {
 
     private fun isLocationChanging(location: Location): Boolean {
         // Check if there is a previous location and time
+        val editor = sharedPreferences.edit()
+        editor.putString("lastSeenLocation", "${location.latitude}/${location.longitude}")
+        editor.apply()
+
         if (lastSeenLocation != null && lastSeenLocationTime != null) {
             // Calculate the distance between the current location and the last seen location
             val distance = lastSeenLocation!!.distanceTo(location)

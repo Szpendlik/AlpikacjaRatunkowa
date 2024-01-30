@@ -1,5 +1,6 @@
 package com.example.alpikacjaratunkowa
 
+import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.PersistableBundle
@@ -16,7 +17,12 @@ class AlertActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         emergencyAlert = EmergencyAlertManager(this)
         Log.d("Alert","Alert Activity onCreate")
-        emergencyAlert.startEmergencyAlert(10000, "507480247", null)
+        val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+
+        val phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
+        val alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
+        val location = sharedPreferences.getString("lastSeenLocation", null) ?: null
+        emergencyAlert.startEmergencyAlert(alertDuration, phoneNumber, null, location)
 
     }
 }
