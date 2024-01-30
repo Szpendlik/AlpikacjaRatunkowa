@@ -36,6 +36,9 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import org.json.JSONStringer
+import java.time.Duration
+import java.time.LocalDateTime
 
 import kotlin.math.abs
 
@@ -51,6 +54,7 @@ class MyServices : Service(), SensorEventListener {
     private var lastGyroY: Float = 0f
     private var lastGyroZ: Float = 0f
     private var lastSeenLocation: Location? = null
+    private var lastSeenLocationTime = LocalDateTime.now()
     private lateinit var phoneNumber: String
     private var alertDuration: Long = 10000
     private var currentAccX: Float = 0f
@@ -159,6 +163,9 @@ class MyServices : Service(), SensorEventListener {
             val locationCallback = object : LocationCallback() {
                 override fun onLocationResult(p0: LocationResult) {
                     for (location in p0.locations) {
+                        if (!isLocationChanging(location) && !isAlreadyNotSafe){
+                            personIsNotSafe()
+                        }
                         lastSeenLocation = location
                         Log.d("GPS",SMSMessageUtils.getCity(
                             location.latitude,
@@ -184,6 +191,31 @@ class MyServices : Service(), SensorEventListener {
             )
 
             return super.onStartCommand(intent, flags, startId)
+    }
+
+    private fun isLocationChanging(location: Location): Boolean {
+        // Check if there is a previous location and time
+        val editor = sharedPreferences.edit()
+        editor.putString("lastSeenLocation", "${location.latitude}/${location.longitude}")
+        editor.apply()
+
+        if (lastSeenLocation != null && lastSeenLocationTime != null) {
+            // Calculate the distance between the current location and the last seen location
+            val distance = lastSeenLocation!!.distanceTo(location)
+
+            // Calculate the time difference between the current time and the last seen time
+            val timeDifference = Duration.between(lastSeenLocationTime, LocalDateTime.now())
+
+            // Check if the location has changed by more than 500 meters within the last 10 minutes
+            if (distance < 500 && timeDifference.toMinutes() >= 10) {
+                return false
+            }
+            if (distance > 500) {
+                lastSeenLocation = location
+                lastSeenLocationTime = LocalDateTime.now()
+            }
+        }
+        return true
     }
 
     @SuppressLint("SetTextI18n")
@@ -225,7 +257,7 @@ class MyServices : Service(), SensorEventListener {
         }
 
 
-        personNotSave()
+        isPersonSave()
     }
 
 override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -281,61 +313,64 @@ override fun onDestroy() {
     }
 
     @SuppressLint("InvalidWakeLockTag")
-    private fun personNotSave() {
+    private fun isPersonSave() {
         if(hasGyroChanged && hasAccChanged && !isAlreadyNotSafe) {
-            isAlreadyNotSafe = true
-            phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
-            alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
-            Log.d("PersonNotSafe", "Making notification")
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                val NOTIFICATION_CHANNEL_ID = "com.currency.usdtoinr"
-                val channelName = "My Background Service"
-                val chan = NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE)
-                chan.lightColor = Color.BLUE
-                chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-                val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                manager.createNotificationChannel(chan)
+            personIsNotSafe()
+        }
+    }
+    private fun personIsNotSafe(){
+        isAlreadyNotSafe = true
+        phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
+        alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
+        Log.d("PersonNotSafe", "Making notification")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val NOTIFICATION_CHANNEL_ID = "com.currency.usdtoinr"
+            val channelName = "My Background Service"
+            val chan = NotificationChannel(NOTIFICATION_CHANNEL_ID, channelName, NotificationManager.IMPORTANCE_NONE)
+            chan.lightColor = Color.BLUE
+            chan.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
+            val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            manager.createNotificationChannel(chan)
 
-                val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                val notification = notificationBuilder.setOngoing(true)
-                    .setContentTitle("")
-                    .setPriority(NotificationManager.IMPORTANCE_MIN)
-                    .setCategory(Notification.CATEGORY_SERVICE)
-                    .build()
-                startForeground(2, notification)
+            val notificationBuilder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+            val notification = notificationBuilder.setOngoing(true)
+                .setContentTitle("")
+                .setPriority(NotificationManager.IMPORTANCE_MIN)
+                .setCategory(Notification.CATEGORY_SERVICE)
+                .build()
+            startForeground(2, notification)
 
-                val dialogIntent = Intent(this, AlertActivity::class.java)
-                dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                startActivity(dialogIntent)
-                Log.d("sk", "After startforeground executed")
+            val dialogIntent = Intent(this, AlertActivity::class.java)
+            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(dialogIntent)
+            Log.d("sk", "After startforeground executed")
 
-            } else {
+        } else {
 
             var notificationIntent = Intent(this, MainActivity::class.java)
 
 
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
+            val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
 
             Log.d("PersonNotSafe", "Notification bilder")
-        var notification = Notification.Builder(this, "your_channel_id")
-            .setContentTitle("")
-            .setContentText("")
-            .setContentIntent(pendingIntent)
-            .setTicker("")
-            .build()
+            var notification = Notification.Builder(this, "your_channel_id")
+                .setContentTitle("")
+                .setContentText("")
+                .setContentIntent(pendingIntent)
+                .setTicker("")
+                .build()
 
-        startForeground(2, notification)
+            startForeground(2, notification)
             Log.d("PersonNotSafe", "Crerate activiti")
-        val dialogIntent = Intent(this, AlertActivity::class.java)
-        dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            val dialogIntent = Intent(this, AlertActivity::class.java)
+            dialogIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             Log.d("PersonNotSafe", "before activity start")
-        startActivity(dialogIntent)
-            }
+            startActivity(dialogIntent)
+        }
 //        emergencyAlertManager.startEmergencyAlert(alertDuration, phoneNumber, lastSeenLocation)
 //        Log.d("PersonNotSafe", "Safe")
 
-        }
-
     }
+
 }
 
