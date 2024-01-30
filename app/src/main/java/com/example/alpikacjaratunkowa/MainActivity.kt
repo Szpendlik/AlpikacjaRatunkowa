@@ -5,45 +5,45 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-
-
-
+import android.widget.Switch
+import androidx.constraintlayout.widget.ConstraintLayout
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var accelerometerValues: TextView
-    private lateinit var gyroscopeValues: TextView
-    private lateinit var gpsValues: TextView
-    private lateinit var emergencyAlertManager: EmergencyAlertManager
-    private lateinit var startEmergencyButton: Button
-    private lateinit var settingsButton: Button
 
-//    fun startMyService(){
-//        startService(Intent(this, MyServices::class.java))
-//    }
+    private lateinit var settingsButton: Button
+    private lateinit var modeSwitch: Switch
+    private lateinit var constraintLayout: ConstraintLayout // Dodana deklaracja zmiennej constraintLayout
+
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         startService(Intent(this, MyServices::class.java))
 
-
         settingsButton = findViewById(R.id.settingsButton)
+        modeSwitch = findViewById(R.id.modeSwitch)
+        constraintLayout = findViewById(R.id.constraintLayout) // Inicjalizacja zmiennej constraintLayout
 
         settingsButton.setOnClickListener {
             openSettingsActivity()
         }
 
-//        startEmergencyButton = findViewById(R.id.startEmergencyButton)
-//        startMyService()
-//        startEmergencyButton.setOnClickListener {
-//            startMyService()
-//
-//        }
+        // Ustaw nasłuchiwacz zmiany trybu w przełączniku
+        modeSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                // Tryb górski
+                constraintLayout.setBackgroundResource(R.drawable.bg2)
+
+            } else {
+                // Tryb samochodowy
+                constraintLayout.setBackgroundResource(R.drawable.bg)
+
+            }
+        }
+
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.SEND_SMS

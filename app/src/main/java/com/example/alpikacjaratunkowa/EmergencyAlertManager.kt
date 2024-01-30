@@ -23,7 +23,7 @@ class EmergencyAlertManager(private val context: Context) {
     fun startEmergencyAlert(countdownDuration: Long, phoneNumber: String, lastSeenLocation: Location?, locationString: String?) {
         if (!isAlertShown) {
             Log.d("ALERT", "Goedemorgen")
-            showAlert(countdownDuration, phoneNumber, null, lastSeenLocation, locationString)
+            showAlert((countdownDuration)*1000, phoneNumber, null, lastSeenLocation, locationString)
         }
     }
 
