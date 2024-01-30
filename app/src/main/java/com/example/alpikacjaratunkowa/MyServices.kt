@@ -9,17 +9,21 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.location.Location
+import android.os.Build
 import android.os.IBinder
 import android.os.Looper
 import android.os.PowerManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationCompat
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -31,20 +35,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-
-import android.content.SharedPreferences
-import android.graphics.Color
-import android.os.Build
-import androidx.core.app.NotificationCompat
-import org.json.JSONStringer
 import java.time.Duration
 import java.time.LocalDateTime
-
 import kotlin.math.abs
 
 
 class MyServices : Service(), SensorEventListener {
-    private var isAlreadyNotSafe = false;
+    private var isAlreadyNotSafe = false
     private var thresholdAcc: Float = 20.0f
     private var thresholdGyro: Float = 5.0f
     private var lastAccX: Float = 0f
