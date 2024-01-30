@@ -7,27 +7,30 @@
     android:layout_height="match_parent"
     tools:context=".AlertScreenActivity"
     android:background="@drawable/bg3">
-<TextView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:text="UWAGA SPIERDOLIŁEŚ SIE Z URWISKA"
-    />
 
-    <Button
-        android:id="@+id/callEmergencyNumber"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Call Emergency"
-        app:layout_constraintBottom_toTopOf="@+id/callFriendNumber"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/callFriendNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="324dp"
+        android:backgroundTint="@color/light_blue_900"
         android:text="Call Friend / Family"
+        android:textColor="@color/white"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/callEmergencyNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:backgroundTint="@color/light_blue_900"
+        android:text="Call Emergency"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toTopOf="@+id/callFriendNumber"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 

@@ -46,7 +46,7 @@ class EmergencyAlertManager(private val context: Context) {
             override fun onTick(millisUntilFinished: Long) {
                 // Wyświetlanie pozostałego czasu
                 val secondsRemaining = millisUntilFinished / 1000
-                alertDialog.setMessage("Wykryto $reason. Czy potrzebujesz pomocy? Kliknij OK, aby anulować. Pozostały czas: $secondsRemaining s")
+                alertDialog.setMessage("Wykryto wypadek. Czy potrzebujesz pomocy? Kliknij OK, aby anulować. Pozostały czas: $secondsRemaining s")
             }
 
             override fun onFinish() {
