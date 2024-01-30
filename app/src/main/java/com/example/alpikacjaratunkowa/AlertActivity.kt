@@ -20,18 +20,16 @@ class AlertActivity : AppCompatActivity() {
     private lateinit var emergencyAlert: EmergencyAlertManager
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        emergencyAlert = EmergencyAlertManager(this)
-        Log.d("Alert","Alert Activity onCreate")
-        val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
-
-        val phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
-        val alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
-        val location = sharedPreferences.getString("lastSeenLocation", null) ?: null
+//        emergencyAlert = EmergencyAlertManager(this)
+//        Log.d("Alert","Alert Activity onCreate")
+//        val sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
+//
+//        val phoneNumber = sharedPreferences.getString("phoneNumber", "888119218") ?: "888119218"
+//        val alertDuration = sharedPreferences.getString("alertDuration", "10000")?.toLong() ?: 10000
+//        val location = sharedPreferences.getString("lastSeenLocation", null) ?: null
         val intent = Intent(this, AlertScreenActivity::class.java)
         startActivity(intent)
-//        CoroutineScope(Dispatchers.Default).launch {
-//            delay(1000) // Set the interval in milliseconds
-            emergencyAlert.startEmergencyAlert(alertDuration, phoneNumber, null, location)
-//        }
+//         emergencyAlert.startEmergencyAlert(alertDuration, phoneNumber, null, location)
+
     }
 }
