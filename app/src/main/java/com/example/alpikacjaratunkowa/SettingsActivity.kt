@@ -6,14 +6,17 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Switch
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 
 class SettingsActivity : AppCompatActivity() {
 
     private lateinit var saveButton: Button
     private lateinit var phoneNumberEditText: EditText
     private lateinit var alertDurationEditText: EditText
+    private lateinit var constraintLayout: ConstraintLayout
     private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -23,6 +26,7 @@ class SettingsActivity : AppCompatActivity() {
         saveButton = findViewById(R.id.saveButton)
         phoneNumberEditText = findViewById(R.id.phoneNumberEditText)
         alertDurationEditText = findViewById(R.id.alertDurationEditText)
+        constraintLayout = findViewById(R.id.constraintLayout)
         sharedPreferences = getSharedPreferences("MyPrefs", MODE_PRIVATE)
 
         loadSettings()
@@ -38,6 +42,8 @@ class SettingsActivity : AppCompatActivity() {
                 saveButton.isEnabled = isValidPhoneNumber(s.toString())
             }
         })
+
+
 
         saveButton.setOnClickListener {
             saveSettings()
@@ -55,9 +61,11 @@ class SettingsActivity : AppCompatActivity() {
     private fun loadSettings() {
         val phoneNumber = sharedPreferences.getString("phoneNumber", "")
         val alertDuration = sharedPreferences.getString("alertDuration", "")
+        val switchValue = sharedPreferences.getBoolean("switchValue", false)
 
         phoneNumberEditText.setText(phoneNumber)
         alertDurationEditText.setText(alertDuration)
+
     }
 
     private fun isValidPhoneNumber(phoneNumber: String): Boolean {
