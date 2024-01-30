@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".SettingsActivity"
-    android:background="@drawable/bg"
+    android:background="@drawable/bg4"
     android:id="@+id/constraintLayout">
 
 
